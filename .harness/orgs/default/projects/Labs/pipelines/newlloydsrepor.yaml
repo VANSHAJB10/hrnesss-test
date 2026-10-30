@@ -1,0 +1,45 @@
+pipeline:
+  name: new-lloyds-repor
+  identifier: newlloydsrepor
+  projectIdentifier: Labs
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: cus-001
+        identifier: cus001
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          echo "Value of branchVAR: <+stage.variables.branchVariable>"
+
+                          # Also print pipeline.branch to see if it is populated at all
+                          echo "pipeline.branch resolved to: '<+pipeline.branch>'"
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+          environment:
+            environmentRef: K8Env
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: lab2infra
+        tags: {}
+        variables:
+          - name: branchVariable
+            type: String
+            description: ""
+            required: false
+            value: "<+<+pipeline.branch> == \"main\" ? \"prod\" : <+pipeline.branch> == \"preprod\" ? \"preprod\" : \"dev\">"
